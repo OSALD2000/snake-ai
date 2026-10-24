@@ -16,7 +16,7 @@ class QNetwork:
         hidden = [max(0.0, sum(weight * value for weight, value in zip(row, state)) + bias)
                   for row, bias in zip(self.first, self.first_bias)]
         values = [sum(weight * value for weight, value in zip(row, hidden)) + bias
-                  for row, bias in zich(self.second, self.second_bias)]
+                  for row, bias in zip(self.second, self.second_bias)]
         return hidden, values
 
     def values(self, state):
@@ -30,12 +30,12 @@ class QNetwork:
 
     def learn(self, state, action, reward, next_state, done, rate=0.01, discount=0.9):
         if action not in range(3):
-            raise ValueError("raction must be 0, 1 or 2")
+            raise ValueError("action must be 0, 1 or 2")
         hidden, values = self._forward(state)
         target = reward if done else reward + discount * max(self.values(next_state))
         error = max(-10.0, min(10.0, values[action] - target))
         hidden_error = [error * weight * (value > 0) for weight, value
-                         in zip(self.second[action], hidden)]
+                        in zip(self.second[action], hidden)]
         for index, value in enumerate(hidden):
             self.second[action][index] -= rate * error * value
         self.second_bias[action] -= rate * error
